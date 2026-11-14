@@ -177,6 +177,88 @@ sequenceDiagram
     CLI-->>Owner: stderr one-line message, exit 1
 ```
 
+**Critical flow 3: No notes match, or the query itself is blank**
+
+```mermaid
+sequenceDiagram
+    actor Owner
+    participant CLI
+    participant Core as KnowledgeBase
+    participant MD as MarkdownBackend
+    participant Notes as Notes root
+    Owner->>CLI: query "<question>" --mode markdown
+    CLI->>Core: query(text, mode)
+    Core->>MD: query(text)
+    alt query is blank or whitespace-only
+        MD->>MD: detect blank/whitespace query text
+        MD--xCore: raises BlankQueryError
+        Core--xCLI: propagates BlankQueryError
+        CLI-->>Owner: stderr one-line message, exit 1
+    else query has significant words
+        MD->>Notes: scan *.md files fresh
+        Notes-->>MD: file contents
+        MD->>MD: parse frontmatter, match significant words
+        MD->>MD: zero notes satisfy every significant word
+        MD-->>Core: Answer(text="no matching notes", sources=[])
+        Core-->>CLI: Answer
+        CLI-->>Owner: prints "no matching notes" message
+    end
+```
+
+**Critical flow 4: A malformed note is skipped while healthy notes still match**
+
+```mermaid
+sequenceDiagram
+    actor Owner
+    participant CLI
+    participant Core as KnowledgeBase
+    participant MD as MarkdownBackend
+    participant Notes as Notes root
+    Owner->>CLI: query "<question>" --mode markdown
+    CLI->>Core: query(text, mode)
+    Core->>MD: query(text)
+    MD->>Notes: scan *.md files fresh
+    Notes-->>MD: file contents
+    MD->>MD: parse each note's frontmatter
+    alt note is unreadable, or its frontmatter is missing/malformed
+        MD->>MD: exclude note from matching, increment skipped count
+        Note over MD,Notes: note never silently dropped - always counted toward the skipped total
+    else note is healthy
+        MD->>MD: include note in the matching pool
+    end
+    MD->>MD: match significant words, rank, bound excerpt over healthy notes
+    MD-->>Core: Answer(text with skipped count appended, sources)
+    Core-->>CLI: Answer
+    CLI-->>Owner: prints ranked excerpts of healthy notes + skipped count
+```
+
+**Critical flow 5: A symlink escaping the notes root is rejected**
+
+```mermaid
+sequenceDiagram
+    actor Owner
+    participant CLI
+    participant Core as KnowledgeBase
+    participant MD as MarkdownBackend
+    participant Notes as Notes root
+    Owner->>CLI: query "<question>" --mode markdown
+    CLI->>Core: query(text, mode)
+    Core->>MD: query(text)
+    MD->>Notes: scan *.md files fresh
+    Notes-->>MD: file contents, including a symbolic link entry
+    MD->>MD: resolve symlink target
+    alt resolved target falls outside the notes root, or resolution loops
+        MD->>MD: reject symlink, exclude from matching, increment skipped count
+        Note over MD,Notes: linked content never enters the answer
+    else resolved target lies inside the notes root
+        MD->>MD: follow symlink, treat as normal note content
+    end
+    MD->>MD: match significant words, rank, bound excerpt
+    MD-->>Core: Answer(text with skipped count appended, sources)
+    Core-->>CLI: Answer
+    CLI-->>Owner: prints ranked excerpts + skipped count
+```
+
 ## 7. Deployment view
 
 <!-- N/A: reuses the existing deployment unit (the local `kb` CLI process, run directly by the Owner). This feature changes code inside the existing markdown-backend module only — no new process, no new infra. -->
