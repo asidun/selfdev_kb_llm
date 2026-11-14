@@ -1,0 +1,58 @@
+{
+  "slug": "_scaffold",
+  "tasks": [
+    {
+      "id": "S1",
+      "title": "Create the module/folder structure + entry point",
+      "layer": "scaffold",
+      "deps": [],
+      "acs": [],
+      "dod": "project builds (empty): `pip install -e .` succeeds and `kb --help` runs",
+      "files_hint": [
+        "pyproject.toml",
+        "src/kb/__init__.py",
+        "src/kb/cli/main.py",
+        "src/kb/core/knowledge_base.py",
+        "src/kb/backends/markdown/backend.py",
+        "src/kb/backends/vector/backend.py",
+        "src/kb/config/settings.py"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Wire the test harness + a smoke test",
+      "layer": "scaffold",
+      "deps": ["S1"],
+      "acs": [],
+      "dod": "empty test suite runs green; a `kb --help` boots smoke test passes under pytest",
+      "files_hint": ["tests/", "tests/test_smoke.py", "pyproject.toml"]
+    },
+    {
+      "id": "S3",
+      "title": "Set up the vector-store adapter scaffolding (Chroma)",
+      "layer": "scaffold",
+      "deps": ["S1"],
+      "acs": [],
+      "dod": "a local (temp-dir) Chroma collection can be created and queried empty, exercised by an integration test",
+      "files_hint": ["src/kb/backends/vector/chroma_store.py", "tests/backends/test_vector_backend.py"]
+    },
+    {
+      "id": "S4",
+      "title": "Add the CI workflow (build + test + lint)",
+      "layer": "scaffold",
+      "deps": ["S2"],
+      "acs": [],
+      "dod": "CI config is valid; the commands match the detected toolchain (pip install -e ., pytest, ruff+black)",
+      "files_hint": [".github/workflows/ci.yml"]
+    },
+    {
+      "id": "S5",
+      "title": "Write CLAUDE.md from the chosen conventions",
+      "layer": "scaffold",
+      "deps": ["S1"],
+      "acs": [],
+      "dod": "conventions doc reflects docs/architecture-map.md (module layout, error handling, ID strategy, test layout)",
+      "files_hint": ["CLAUDE.md"]
+    }
+  ]
+}
