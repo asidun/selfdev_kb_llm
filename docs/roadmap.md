@@ -30,6 +30,7 @@ The owner can query one personal markdown knowledge base from the CLI, choosing 
 |---|---|:---:|---|
 | Automatic reindex / staleness detection for the vector index (enhancement past v1's manual command) | Whether file-watch is worth adding once step 3 ships, and what "staleness" should trigger it | — | A recon pass once step 3 is spec'd and manual reindexing has been used for a while |
 | Second vector-DB adapter beyond Chroma | Which vector DB (if any) to support next, and whether the current `VectorStore` port shape generalizes to it | — | A recon pass once a concrete second target is named (see Open decisions D2) |
+| Agent-initiated writes back into the KB (not scoped today — the CLI only exposes read-only `query` and owner-triggered `reindex`) | Whether an agent should ever be allowed to propose new notes, and if so, how to gate that write so an unreviewed fact can't corrupt the source of truth | — | If this feature is ever picked up: the "2-Phase Commit for agent memory" prepare/confirm pattern (`https://dou.ua/forums/topic/60353/`, cited in `docs/idea-brief.md` §6) is the precedent to revisit |
 
 ## Out of scope
 
