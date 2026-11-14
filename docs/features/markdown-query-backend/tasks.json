@@ -1,0 +1,104 @@
+{
+  "slug": "markdown-query-backend",
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Add PyYAML as a base (non-optional) dependency",
+      "layer": "wiring",
+      "deps": [],
+      "acs": [],
+      "dod": "pip install -e . (no extras) succeeds and python -c \"import yaml\" succeeds",
+      "files_hint": ["pyproject.toml"],
+      "file": "docs/features/markdown-query-backend/tasks/t1-pyyaml-dependency.md",
+      "status": "todo"
+    },
+    {
+      "id": "T2",
+      "title": "Add NotesRootError and BlankQueryError to the KbError hierarchy",
+      "layer": "domain",
+      "deps": [],
+      "acs": ["AC-04b", "AC-05"],
+      "dod": "Unit test confirms NotesRootError and BlankQueryError are both KbError subclasses",
+      "files_hint": ["src/kb/core/knowledge_base.py"],
+      "file": "docs/features/markdown-query-backend/tasks/t2-kb-error-subclasses.md",
+      "status": "todo"
+    },
+    {
+      "id": "T3",
+      "title": "Implement Note parsing with Frontmatter, skip accounting, and symlink-escape detection",
+      "layer": "domain",
+      "deps": ["T1"],
+      "acs": ["AC-06", "AC-08", "AC-10"],
+      "dod": "Unit tests for parse_note pass for healthy, unreadable, missing-fence, malformed-YAML, missing-keys, symlink-outside, symlink-loop, and symlink-inside cases",
+      "files_hint": ["src/kb/backends/markdown/note.py"],
+      "file": "docs/features/markdown-query-backend/tasks/t3-note-parsing-skip-symlink.md",
+      "status": "todo"
+    },
+    {
+      "id": "T4",
+      "title": "Implement significant-word matching, Frontmatter-boosted ranking, and bounded excerpting",
+      "layer": "domain",
+      "deps": [],
+      "acs": ["AC-01", "AC-02", "AC-02b", "AC-03", "AC-03b"],
+      "dod": "Unit tests cover stopword filtering, substring presence, bucket ranking, path tiebreak, code-fence/table-safe excerpt, and top-10 truncation",
+      "files_hint": ["src/kb/backends/markdown/excerpt.py"],
+      "file": "docs/features/markdown-query-backend/tasks/t4-match-rank-excerpt.md",
+      "status": "todo"
+    },
+    {
+      "id": "T5",
+      "title": "Wire MarkdownBackend.query() to the real scan-parse-match-rank-excerpt pipeline",
+      "layer": "app",
+      "deps": ["T2", "T3", "T4"],
+      "acs": ["AC-04", "AC-07", "AC-09"],
+      "dod": "MarkdownBackend.query raises NotesRootError/BlankQueryError appropriately and returns a ranked, excerpted, skip-counted Answer for all five sad.md §6 flows",
+      "files_hint": ["src/kb/backends/markdown/backend.py"],
+      "file": "docs/features/markdown-query-backend/tasks/t5-markdown-backend-pipeline.md",
+      "status": "todo"
+    },
+    {
+      "id": "T6",
+      "title": "Update test_smoke.py for the new NotesRootError exit-1 behavior",
+      "layer": "tests",
+      "deps": ["T5"],
+      "acs": ["AC-04b"],
+      "dod": "pytest tests/test_smoke.py passes, asserting exit_code == 1 and stderr message for a missing notes root",
+      "files_hint": ["tests/test_smoke.py"],
+      "file": "docs/features/markdown-query-backend/tasks/t6-update-smoke-test.md",
+      "status": "todo"
+    },
+    {
+      "id": "T7",
+      "title": "Integration tests: match, rank, excerpt, no-match, blank-query, fresh-scan",
+      "layer": "tests",
+      "deps": ["T5"],
+      "acs": ["AC-01", "AC-02", "AC-02b", "AC-03", "AC-03b", "AC-04", "AC-05", "AC-09"],
+      "dod": "All checklist tests pass against the T5 implementation using real tmp_path fixtures, no filesystem mocking",
+      "files_hint": ["tests/backends/test_markdown_backend.py"],
+      "file": "docs/features/markdown-query-backend/tasks/t7-integration-tests-match-rank.md",
+      "status": "todo"
+    },
+    {
+      "id": "T8",
+      "title": "Integration tests: skip accounting, symlink escape/loop, non-md exclusion",
+      "layer": "tests",
+      "deps": ["T5"],
+      "acs": ["AC-06", "AC-07", "AC-08", "AC-10"],
+      "dod": "All checklist tests pass, directly asserting the NFR 'no silent note loss' invariant",
+      "files_hint": ["tests/backends/test_markdown_backend.py"],
+      "file": "docs/features/markdown-query-backend/tasks/t8-integration-tests-skip-symlink.md",
+      "status": "todo"
+    },
+    {
+      "id": "T9",
+      "title": "NFR performance test: p95 latency at 300-note and 50-note scale",
+      "layer": "tests",
+      "deps": ["T5"],
+      "acs": [],
+      "dod": "Both latency tests pass locally: p95 <= 500ms at 300 notes, p95 <= 100ms at 50 notes, per spec §6 methodology",
+      "files_hint": ["tests/backends/test_markdown_backend_perf.py"],
+      "file": "docs/features/markdown-query-backend/tasks/t9-perf-latency-test.md",
+      "status": "todo"
+    }
+  ]
+}
