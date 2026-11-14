@@ -20,7 +20,7 @@ The owner can query one personal markdown knowledge base from the CLI, choosing 
 | # | Step | Source | Size | Status |
 |---|---|---|:---:|---|
 | 1 | Scaffold the project skeleton (Python package, CLI entrypoint, test harness, Chroma adapter scaffolding, CI) | `docs/architecture-map.md` §Stack + `docs/features/_scaffold/tasks.json` | S | idea |
-| 2 | Query via direct markdown read (Karpathy-style backend: reads notes directly, no embeddings) | `docs/idea-brief.md` §7 | M | idea |
+| 2 | Query via direct markdown read (Karpathy-style backend: reads notes directly, no embeddings) | `docs/features/markdown-query-backend/spec.md` | S | spec'd |
 | 3 | Query via RAG against Chroma (embeds notes, manual reindex command, vector-mode query) | `docs/idea-brief.md` §7; `docs/adr/0001-use-python-typer-chroma-stack.md` | M | idea |
 | 4 | One CLI command with a per-query mode switch unifying both backends | `docs/idea-brief.md` §7 ("two swappable retrieval backends chosen per query") | S | idea |
 
