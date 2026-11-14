@@ -23,7 +23,7 @@ frontend: ""             # no frontend; this is a CLI tool
 ## Stack
 
 - Language / runtime: Python 3.12
-- Frameworks: Typer (CLI), ChromaDB (first concrete vector-DB adapter, embedded/local)
+- Frameworks: Typer (CLI), ChromaDB (first concrete vector-DB adapter, embedded/local), using Chroma's bundled default embedding function (local ONNX model, all-MiniLM-L6-v2 — no API key, no network call)
 - Build / test / lint: `pip install -e .` / `pytest` / `ruff check . && black --check .`
 
 ## C4 — system as it is
@@ -34,27 +34,29 @@ C4Container
     Person(user, "Owner", "runs the CLI from a terminal or scripts")
     Container(cli, "kb CLI", "Python/Typer", "parses commands, dispatches to the chosen backend")
     Container(core, "KnowledgeBase core", "Python", "domain logic: note model, query routing between backends")
-    Container(md_backend, "Markdown backend", "Python", "reads/synthesizes answers directly from markdown note files, no embeddings")
+    Container(md_backend, "Markdown backend", "Python", "reads markdown note files directly and returns matching note content/excerpts, no embeddings, no internal LLM call — synthesis into a final answer is the calling LLM/client's job")
     Container(vec_backend, "Vector backend", "Python", "embeds notes, retrieves via a pluggable vector-DB adapter")
     ContainerDb(notes, "Markdown notes", "filesystem", "the single source-of-truth content store")
     ContainerDb(vectordb, "Vector store", "Chroma (pluggable)", "embeddings indexed from the markdown notes")
+    Container(embedder, "Embedding function", "Chroma default (local ONNX, all-MiniLM-L6-v2)", "turns note/query text into vectors, no network call")
     Rel(user, cli, "invokes")
     Rel(cli, core, "calls")
     Rel(core, md_backend, "routes query (markdown mode)")
     Rel(core, vec_backend, "routes query (RAG mode)")
     Rel(md_backend, notes, "reads")
     Rel(vec_backend, notes, "reads (reindex)")
-    Rel(vec_backend, vectordb, "embeds / queries")
+    Rel(vec_backend, embedder, "embeds text")
+    Rel(vec_backend, vectordb, "stores / queries vectors")
 ```
 
 ## Module inventory
 
 | Module | Path | Layers | Wired at | Responsibility |
 |---|---|---|---|---|
-| cli | `src/kb/cli/` | ports (CLI adapter) | `src/kb/cli/main.py` (planned) | Typer commands: query, ingest, reindex; parses `--mode` flag |
+| cli | `src/kb/cli/` | ports (CLI adapter) | `src/kb/cli/main.py` (planned) | Typer commands: query, reindex; parses `--mode` flag |
 | core | `src/kb/core/` | domain | `src/kb/core/knowledge_base.py` (planned) | KnowledgeBase domain type; routes a query to the selected backend behind a common interface |
-| backends/markdown | `src/kb/backends/markdown/` | infra (adapter) | `src/kb/backends/markdown/backend.py` (planned) | direct markdown-file read + synthesis (Karpathy-style: title/summary/tags/content, folders like `inbox/`) |
-| backends/vector | `src/kb/backends/vector/` | infra (adapter) | `src/kb/backends/vector/backend.py` (planned) | embeds notes, indexes/queries via a `VectorStore` port; Chroma is the first concrete implementation |
+| backends/markdown | `src/kb/backends/markdown/` | infra (adapter) | `src/kb/backends/markdown/backend.py` (planned) | direct markdown-file read + excerpt matching (Karpathy-style: title/summary/tags/content, folders like `inbox/`); no embeddings, no internal LLM call |
+| backends/vector | `src/kb/backends/vector/` | infra (adapter) | `src/kb/backends/vector/backend.py` (planned) | embeds notes via Chroma's default local embedder, indexes/queries via a `VectorStore` port; Chroma is the first concrete implementation |
 | config | `src/kb/config/` | infra | `src/kb/config/settings.py` (planned) | notes root path, backend selection defaults, vector-DB connection settings |
 
 ## Conventions (cited — the rules a new feature must match)

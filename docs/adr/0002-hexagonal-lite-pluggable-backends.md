@@ -21,7 +21,8 @@ time. The module structure must make that switch a parameter, not a rewrite.
 
 ## Decision drivers
 
-- Owner-decided: switching is per-query, not per-deployment (idea-brief, "Switch mechanism").
+- Owner-decided: switching is per-query, not per-deployment (idea-brief §7: "two swappable
+  retrieval backends chosen per query").
 - Owner-reported pluggability goal: more vector DBs must be addable later without touching the
   CLI or the markdown backend.
 

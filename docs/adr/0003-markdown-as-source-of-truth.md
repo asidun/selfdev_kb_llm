@@ -20,8 +20,8 @@ strategy decided now, since it is hard to change once notes and a vector index b
 
 ## Decision drivers
 
-- Owner-reported goal: no single existing wiki yet, starting from empty (idea-brief, "Existing
-  data") — no legacy storage format to preserve.
+- Owner-reported goal: starting from an empty markdown note collection (idea-brief §7: "starting
+  from an empty markdown note collection") — no legacy storage format to preserve.
 - Owner-reported risk already logged in idea-brief §7: the vector index must stay in sync with one
   canonical content store — picking markdown-as-source-of-truth settles which side is canonical.
 

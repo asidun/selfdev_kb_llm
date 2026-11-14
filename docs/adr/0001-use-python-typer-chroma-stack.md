@@ -22,8 +22,8 @@ any code can be scaffolded.
 
 ## Decision drivers
 
-- Owner-reported goal: the vector-DB side must be pluggable ("any vector database") — the stack
-  must make writing additional adapters straightforward (idea-brief §7).
+- Owner-reported goal: the vector-DB side must be pluggable ("any vector DB as RAG" — idea-brief §2
+  Problem) — the stack must make writing additional adapters straightforward (idea-brief §7).
 - Single-user CLI tool, no deadline, exploratory (idea-brief §4) — favors the ecosystem with the
   richest off-the-shelf embedding/vector-DB tooling over raw performance.
 - CLI-only interface, no HTTP server (confirmed during `survey` intent confirmation).

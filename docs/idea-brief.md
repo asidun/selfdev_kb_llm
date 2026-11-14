@@ -17,7 +17,7 @@ Owner wants one knowledge-base tool usable across different LLM clients/tools, n
 
 ## 3. Users
 
-Single user: the owner (Andrii Sidun), personal use. Owner-decided: accessed via CLI/local API (not an MCP server), called directly from scripts or other programs when querying the knowledge base, independent of which LLM/client consumes the results.
+Single user: the owner (Andrii Sidun), personal use. Owner-decided: accessed via CLI only (not an MCP server, not a local HTTP API) — narrowed from the original "CLI/local API" framing during the `survey` intent confirmation, where the owner chose "CLI only" explicitly over "CLI + local API" and "local API only". Called directly as a subprocess from scripts or other programs when querying the knowledge base, independent of which LLM/client consumes the results.
 
 ## 4. Why now
 
@@ -35,7 +35,7 @@ Compact evidence ledger:
 |---|---|---|---|
 | Referenced DOU forum post describes a markdown-based "WikiMemory" system with a prepare/confirm human-approval gate, rejecting vector DBs in favor of git-reviewable Markdown files | source-verified | https://dou.ua/forums/topic/60353/ (fetched 2026-11-14) | Article does not mention "Andrej Karpathy's approach" by that name; that framing came from the owner, not the source. Limitation: fetched via automated summary, not full manual read. |
 | "Karpathy's LLM wiki approach" = plain markdown notes folder (consistent per-note structure: title/summary/tags/content, folders like `inbox/`, `projects/`, `reference/`) read directly by Claude Code via natural-language queries, no embeddings by default; vector/semantic search suggested only as an optional scaling layer past "a few hundred notes" | source-verified | https://www.mindstudio.ai/blog/andrej-karpathy-llm-wiki-knowledge-base-claude-code (fetched 2026-11-14) | Automated summary, not full manual read. |
-| An installed Claude Code plugin `llm-wiki` (v2.9.0) already implements this markdown-wiki mode: commands `wiki-init`, `wiki-ingest`, `wiki-query`, `wiki-lint`, `wiki-log` and agents `wiki-ingestor`, `wiki-librarian`, `wiki-linter` | source-verified | local plugin cache: `C:\Users\AndriiSidunContract\.claude\plugins\cache\claude-code-skills\llm-wiki\2.9.0` (inspected 2026-11-14) | Directory listing only; internal logic of each skill/agent not read. |
+| An installed Claude Code plugin `llm-wiki` (v2.9.0) already implements this markdown-wiki mode: commands `wiki-init`, `wiki-ingest`, `wiki-query`, `wiki-lint`, `wiki-log` and agents `wiki-ingestor`, `wiki-librarian`, `wiki-linter` | source-verified | local plugin cache: `.claude\plugins\cache\claude-code-skills\llm-wiki\2.9.0` (inspected 2026-11-14) | Directory listing only; internal logic of each skill/agent not read. |
 
 ## 7. Recommendation
 

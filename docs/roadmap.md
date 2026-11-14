@@ -22,13 +22,13 @@ The owner can query one personal markdown knowledge base from the CLI, choosing 
 | 1 | Scaffold the project skeleton (Python package, CLI entrypoint, test harness, Chroma adapter scaffolding, CI) | `docs/architecture-map.md` §Stack + `docs/features/_scaffold/tasks.json` | S | idea |
 | 2 | Query via direct markdown read (Karpathy-style backend: reads notes directly, no embeddings) | `docs/idea-brief.md` §7 | M | idea |
 | 3 | Query via RAG against Chroma (embeds notes, manual reindex command, vector-mode query) | `docs/idea-brief.md` §7; `docs/adr/0001-use-python-typer-chroma-stack.md` | M | idea |
-| 4 | One CLI command with a per-query mode switch unifying both backends | `docs/idea-brief.md` §7 ("Switch mechanism") | S | idea |
+| 4 | One CLI command with a per-query mode switch unifying both backends | `docs/idea-brief.md` §7 ("two swappable retrieval backends chosen per query") | S | idea |
 
 ## Not yet specified
 
 | Area | What we'd have to learn | Blocks | How it gets sharpened |
 |---|---|:---:|---|
-| Automatic reindex / staleness detection for the vector index | Whether file-watch or an explicit manual command is enough, and if auto-reindex is wanted at all | 3 | A grilling conversation with the owner (see Open decisions D1), or a recon pass once step 3 is spec'd |
+| Automatic reindex / staleness detection for the vector index (enhancement past v1's manual command) | Whether file-watch is worth adding once step 3 ships, and what "staleness" should trigger it | — | A recon pass once step 3 is spec'd and manual reindexing has been used for a while |
 | Second vector-DB adapter beyond Chroma | Which vector DB (if any) to support next, and whether the current `VectorStore` port shape generalizes to it | — | A recon pass once a concrete second target is named (see Open decisions D2) |
 
 ## Out of scope
@@ -40,7 +40,6 @@ The owner can query one personal markdown knowledge base from the CLI, choosing 
 
 | # | Question | Type | Owner | Blocks |
 |---|---|:---:|:---:|:---:|
-| D1 | Should the vector index reindex automatically (file-watch) or stay manual-only for v1? | grilling | human | 3 |
 | D2 | Which second vector database, if any, should be supported after Chroma? | grilling | human | — |
 
 ## Decisions so far
@@ -49,6 +48,7 @@ The owner can query one personal markdown knowledge base from the CLI, choosing 
 - Stack: Python 3.12 + Typer + Chroma → [`docs/adr/0001-use-python-typer-chroma-stack.md`](adr/0001-use-python-typer-chroma-stack.md)
 - Backends structured as interchangeable ports behind a `KnowledgeBase` core → [`docs/adr/0002-hexagonal-lite-pluggable-backends.md`](adr/0002-hexagonal-lite-pluggable-backends.md)
 - Markdown files are the single source of truth; no relational database → [`docs/adr/0003-markdown-as-source-of-truth.md`](adr/0003-markdown-as-source-of-truth.md)
+- Vector index reindex stays manual-only for v1 (step 3's own scope is a manual reindex command); automatic/file-watch reindexing is deferred as a post-v1 enhancement, not a blocking unknown → see step 3, `## Not yet specified`
 
 ## Dependency graph
 
@@ -64,8 +64,8 @@ flowchart LR
 | Wave | Steps | Zone per step (why parallel-safe) | Unlocks |
 |:---:|---|---|---|
 | 1 | 1 | whole repo (new) | 2 |
-| 2 | 2 | `src/kb/backends/markdown/` (new) | 3 |
-| 3 | 3 | `src/kb/backends/vector/` (new) | 4 |
+| 2 | 2 | `src/kb/backends/markdown/` + `src/kb/core/` (new) | 3 |
+| 3 | 3 | `src/kb/backends/vector/` + `src/kb/core/` (new) | 4 |
 | 4 | 4 | `src/kb/cli/` + `src/kb/core/` (new) | — |
 
 ## Shipped
